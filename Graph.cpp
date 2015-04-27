@@ -1,3 +1,4 @@
+
 #include "Graph.h"
 #include <vector>
 #include <string>
@@ -6,16 +7,20 @@
 #include <stdlib.h>
 using namespace std;
 /**
+    Function prototype:
     void Graph(int)
-    Constructor
+
+    Function description:
+    Constructor for game
     Takes an int n and creates a random graph with n vertices.
     Gives user a start and destination
-    n must be less than total number of sample cities and should be above ~9 for a reasonably sized graph
-    Pre-condition:
-    None
-    Post-condition:
-    Graph generated
-    User initialized
+
+    Example:
+    Graph g=Graph(16);
+
+    Pre-conditions: input < number of sample cities and should be
+    above ~9 for a reasonably sized board
+    Post-conditions: Random Graph generated and user initialized
 **/
 Graph::Graph(int difficulty)
 {
@@ -70,14 +75,23 @@ Graph::Graph(int difficulty)
     }
     you.totalDistance=0;
 }
+Graph::~Graph(){
+
+}
 /**
+    Function prototype:
     void addVertex(string)
-    Takes a string
-    Adds a vertex with the name given to the graph
-    Pre-condition:
-    Graph initialized
-    Post-condition:
-    New vertex appended to vertices
+
+    Function description:
+    Takes a string s
+    Adds a vertex with the name s to the graph
+
+    Example:
+    Graph g;
+    g.addVertex("Boulder");
+
+    Pre-conditions: name is a valid ascii string
+    Post-conditions: New vertex appended to vertices
 
 **/
 void Graph::addVertex(string name){
@@ -88,36 +102,54 @@ void Graph::addVertex(string name){
     vertices.push_back(newV);
 }
 /**
+    Function prototype:
     void addEdge(string,string,int)
+
+    Function description:
     Takes two vertex names and a weight.
-    Adds an edge with the weight between those vertices
-    Pre-condition:
-    vertices named exist
-    Post-condition:
-    the first vertex has a new adjacent vertex
+    Adds the second vertex the the list of adjacent vertices of the first vertex
+
+    Example:
+    Graph g;
+    g.addVertex("Boulder");
+    g.addVertex("Chicago");
+    g.addEdge("Boulder","Chicago",100);
+
+    Pre-condition: vertices named already added
+    Post-condition: the first vertex has a new adjacent vertex
 **/
 void Graph::addEdge(std::string v1, std::string v2, int weight){
     adjVertex newAdj;
-    int ct;
+    int startI;
     int endV;
+    //parse vertices for indexes
     for(int i=0;i<vertices.size();i++){
         if(vertices[i].name==v1){
-            ct=i;
+            startI=i;
         }else if(vertices[i].name==v2){
             endV=i;
         }
     }
+    //add edge
     newAdj.v=&vertices[endV];
     newAdj.weight=weight;
-    vertices[ct].adj.push_back(newAdj);
+    vertices[startI].adj.push_back(newAdj);
 }
 /**
+    Function prototype:
     void displayEdges()
-    displays all vertices and their adjacent vertices
-    Pre-condition:
-    None
-    Post-condition:
-    None
+
+    Function description:
+    displays all vertices and their adjacent vertices in the format:
+    for all vertices:
+        district:name-->adj1***adj2***adjN
+
+    Example:
+    Graph g;
+    g.displayEdges();
+
+    Pre-condition: None
+    Post-condition: None
 **/
 void Graph::displayEdges(){
     for(int i=0;i<vertices.size();i++){
@@ -131,45 +163,41 @@ void Graph::displayEdges(){
         cout<<endl;
     }
 }
-/**
-    void resetBFT()
-    easy way to reset visited value
-**/
 void Graph::resetBFT(){
     for(int i=0;i<vertices.size();i++){
         vertices[i].visited=false;
     }
 }
-/**
-    void findDistricts()
-    calls the other findDistricts method after setting preconditions
-    Pre-condition:
-    Graph created
-    Post-condition:
-    districts assigned
-**/
 void Graph::findDistricts(){
     districts=0;
-    resetBFT()
+    resetBFT();
     findDistricts(vertices[0].name);
 }
 /**
+    Function prototype:
     void findDistricts(string)
-    takes a name
-    Finds all districts in graph
-    Pre-condtion:
-    Graph created
-    districts=0
-    visited=false for all vertices
-    Post-condition:
-    districts assigned
+
+    Function description:
+    Takes a name to start at, iterates districts, and assigns all connected cities the district.
+    Calls itself until all vertices have a district
+
+    Example:
+    Graph g;
+    g.addVertex("Austin");
+    g.addVertex("Boulder");
+    g.addVertex("Chicago");
+    g.addEdge("Austin","Boulder",100);
+    g.findDistricts(Austin);
+
+    Pre-condtion: at least one vertex added, visited=false for all vertices
+    Post-condition: districts assigned
 **/
 void Graph::findDistricts(std::string startingCity){
     districts++;
     queue<vertex*> bfq;
     vertex v;
     int i;
-    //cout<<startingCity<<endl;
+    //get start index
     for(i=0;i<vertices.size();i++){
         if(startingCity==vertices[i].name){
             break;
@@ -178,6 +206,7 @@ void Graph::findDistricts(std::string startingCity){
     vertices[i].visited=true;
     vertices[i].district=districts;
 
+    //BFT to find all connected vertices
     bfq.push(&vertices[i]);
     //cout<<vertices[i].district<<endl;
     while(!bfq.empty()){
@@ -201,6 +230,7 @@ void Graph::findDistricts(std::string startingCity){
             }
         }
     }
+    //call self again if any district not found
     for(i=0;i<vertices.size();i++){
         if(vertices[i].district==-1){
             //cout<<vertices[i].name<<endl;
@@ -216,15 +246,23 @@ struct queueVertex{
     vector<vertex> path;
 };
 /**
+    Function prototype:
     void findShortestPath(string,string)
-    taking the names of the start and destination, it finds and outputs the shortest path between the
-    vertices, ignoring the weight of edges
-    Pre-condition:
-    Graph created
-    districts found
+
+    Function description:
+    taking the names of the start and destination, it finds and outputs the
+    shortest path between the vertices, ignoring the weight of edges
+
+    Example:
+    Graph g;
+    g.addVertex("A");
+    g.addVertex("B");
+    g.addEdge("A","B",2);
+    g.findShortestPath("A","B");
+
+    Pre-condition: Graph created
     names given are valid and in same district
-    Post-condition:
-    None
+    Post-condition: None
 **/
 void Graph::findShortestPath(std::string start, std::string finish){
     vector<vertex> path;
@@ -236,6 +274,7 @@ void Graph::findShortestPath(std::string start, std::string finish){
     vertex endV=null;
     vertex v;
     int i = 0;
+    //get start and destination vertices
     for(i=0; i<vertices.size();i++) {
         if (start==vertices[i].name) {
             startV = vertices[i];
@@ -243,6 +282,7 @@ void Graph::findShortestPath(std::string start, std::string finish){
             endV =vertices[i];
         }
     }
+    //special cases
     if(startV.name==null.name||endV.name==null.name){
         cout<< "One or more cities doesn't exist"<< endl;
         return;
@@ -255,6 +295,7 @@ void Graph::findShortestPath(std::string start, std::string finish){
         cout<< "Please identify the districts before checking distances"<<endl;
         return;
     }
+    //BFT
     resetBFT();
     startV.visited = true;
     queueVertex qv;
@@ -290,12 +331,21 @@ void Graph::findShortestPath(std::string start, std::string finish){
 
 }
 /**
+    Function prototype:
     void Dijkstra(string,string)
+
+    Function description:
     using Dijkstra's algorithm, outputs the shortest path between the vertices inputted
-    Pre-condition:
-    Graph created
-    Post-condition:
-    None
+
+    Example:
+    Graph g;
+    g.addVertex("A");
+    g.addVertex("B");
+    g.addEdge("A","B",2);
+    g.Dijkstra("A","B");
+
+    Pre-condition: Graph created
+    Post-condition: None
 **/
 void Graph::Dijkstra(std::string starting, std::string destination){
     //cout<<"test"<<endl;
@@ -303,6 +353,8 @@ void Graph::Dijkstra(std::string starting, std::string destination){
     vertex *finish;
     vector<vertex*> solved;
     int minDistance;
+    //get start and destination
+    //set visited=false and distance to ~MAX_INT
     for(int i=0;i<vertices.size();i++){
         vertices[i].visited=false;
         vertices[i].distance=2147000000;
@@ -314,6 +366,7 @@ void Graph::Dijkstra(std::string starting, std::string destination){
             finish=&vertices[i];
         }
     }
+    //special cases
     if(start==NULL||finish==NULL){
         cout<<"One or more cities doesn't exist"<<endl;
         return;
@@ -326,6 +379,7 @@ void Graph::Dijkstra(std::string starting, std::string destination){
         cout<<"Please identify the districts before checking distances"<<endl;
         return;
     }
+    //Dijkstra's
     start->visited=true;
     start->distance=0;
     solved.push_back(start);
@@ -357,6 +411,7 @@ void Graph::Dijkstra(std::string starting, std::string destination){
         solved.push_back(temp);
 
     }
+    //output path
     vertex *temp=finish;
     vector<vertex*> path;
     cout<<finish->distance;
@@ -372,13 +427,23 @@ void Graph::Dijkstra(std::string starting, std::string destination){
 
 }
 /**
+    Function prototype:
     void aStar(string,string)
+
+    Function description:
     Using the A* algorithm, finds and outputs the shortest path between the vertices named
-    Pre-condition:
-    Graph created
+    Uses pathLength function for heuristic function
+
+    Example:
+    Graph g;
+    g.addVertex("A");
+    g.addVertex("B");
+    g.addEdge("A","B",2);
+    g.aStar("A","B");
+
+    Pre-condition: Graph created
     names are valid and in the same grid
-    Post-condition:
-    None
+    Post-condition: None
 **/
 void Graph::aStar(std::string startName,std::string finishName){
     vector<vertex*> solved;
@@ -470,10 +535,15 @@ void Graph::aStar(std::string startName,std::string finishName){
     Function description:
     Using a BFT search, it returns the number of edges between the named vertices
 
-    Pre-conditions:
-    The names given are valid and in the same district
-    Post-conditions:
-    returns number of edges between vertices
+    Example:
+    Graph g;
+    g.addVertex("A");
+    g.addVertex("B");
+    g.addEdge("A","B",2);
+    int dist=g.pathLength("A","B");
+
+    Pre-conditions: The names given are valid and in the same district
+    Post-conditions: returns number of edges between vertices
 
 **/
 int Graph::pathLength(std::string start,std::string finish){
@@ -522,7 +592,25 @@ int Graph::pathLength(std::string start,std::string finish){
         }
     }
 }
-void Graph::turn(){
+/**
+    Function prototype:
+    void play()
+
+    Function description:
+    PLays the game taking user input and traversing through the graph.
+    Once finished, displays other search algorithms
+
+    Example:
+    Graph g=Graph(16);
+    g.play();
+
+    Pre-conditions: Graph created with vertices and edges
+    Districts found
+    Post-conditions: None
+
+
+**/
+void Graph::play(){
     string input;
     cout<<"You are at: "<<you.currentLocation->name<<endl;
     cout<<"Your goal is: "<<you.destination->name<<endl;
@@ -541,7 +629,7 @@ void Graph::turn(){
         }
     }
     if(you.currentLocation!=you.destination){
-        turn();
+        play();
     }else{
         cout<<"You win!"<<endl;
         cout<<"Total distance: "<<you.totalDistance<<endl;
@@ -550,6 +638,10 @@ void Graph::turn(){
         Dijkstra(you.start->name,you.destination->name);
         cout<<"A* search algorithm: "<<endl;
         aStar(you.start->name,you.destination->name);
+        cout<<"BFT search (ignores distance):"<<endl;
+        findShortestPath(you.start->name,you.destination->name);
+        cout<<"Graph:"<<endl;
+        displayEdges();
     }
 
 

@@ -41,7 +41,7 @@ public:
     void findShortestPath(std::string start, std::string finish);
     void Dijkstra(std::string start, std::string finish);
     void aStar(std::string start, std::string finish);
-    void turn();
+    void play();
     int pathLength(std::string start,std::string finish);
 private:
     std::vector<vertex> vertices;

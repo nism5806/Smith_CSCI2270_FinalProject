@@ -13,9 +13,7 @@ int main(){
     }
     Graph game=Graph(atoi(input.c_str()));
     game.findDistricts();
-    game.turn();
-
-    //game.displayEdges();
+    game.play();
 
 
     return 0;
