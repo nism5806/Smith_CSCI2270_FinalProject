@@ -26,7 +26,8 @@ Graph::Graph(int difficulty)
 {
     srand(time(NULL));
     //String of city names
-    string cities[]={"Boulder","Baltimore","Chicago","D","E","F","G","H","I","J","K","L","M","N","O","P"};
+    string cities[]={"Austin","Baltimore","Chicago","Denver","Earlington","Fabius","Georgetown","Hague","Iago","Jackson","Kansas City","Louisville","Mack","New York","Oden","Paducah",
+                    "Queenstown","Radley","Springfield","Topeka","Ulman","Vale","Waco","Xenia","Yorktown","Zoar"};
     //adds all cities to graph
     for(int i=0;i<difficulty;i++){
         addVertex(cities[i]);
@@ -51,7 +52,7 @@ Graph::Graph(int difficulty)
                             found=false;
                         }
                     }
-                    if(temp.name==vertices[i].name||temp.adj.size()>sqrt(vertices.size())){
+                    if(temp.name==vertices[i].name||temp.adj.size()>sqrt(vertices.size())+1){
                         found=false;
                     }
                 }
@@ -70,7 +71,7 @@ Graph::Graph(int difficulty)
     you.currentLocation=you.start;
     you.destination=you.start;
     //random destination > 1 move away
-    while(you.destination==you.start||pathLength(you.start->name,you.destination->name)<1){
+    while(you.destination==you.start||pathLength(you.start->name,you.destination->name)<=1){
         you.destination=&vertices[rand()%vertices.size()];
     }
     you.totalDistance=0;
@@ -452,6 +453,7 @@ void Graph::aStar(std::string startName,std::string finishName){
     vertex *start;
     vertex *finish;
     vertex *temp=new vertex;
+    //get vertices
     for(int i=0;i<vertices.size();i++){
         if(vertices[i].name==startName){
             start=&vertices[i];
@@ -461,23 +463,20 @@ void Graph::aStar(std::string startName,std::string finishName){
         }
     }
     start->distance=0;
-    start->distEst=start->distance+100*pathLength(start->name,finish->name);
+    start->distEst=start->distance+100*pathLength(start->name,finish->name); //current distance + minimum distance possible given closest traverse
     start->previous=NULL;
     toBeSolved.push_back(start);
     while(!toBeSolved.empty()){
         temp=toBeSolved[0];
         int tempI=0;
-        //cout<<"toBeSolved:"<<endl;
-        //cout<<temp->name<<endl;
+        //get toBeSolved vertex with lowest distEst
         for(int i=1;i<toBeSolved.size();i++){
-            //cout<<toBeSolved[i]->name<<endl;
             if(toBeSolved[i]->distEst<temp->distEst){
                 temp=toBeSolved[i];
                 tempI=i;
             }
         }
-        //cout<<"temp:"<<endl;
-        //cout<<temp->name<<endl;
+        //finish found case -- output path
         if(temp->name==finish->name){
             while(temp!=NULL){
                 path.insert(path.begin(),temp);
@@ -491,20 +490,19 @@ void Graph::aStar(std::string startName,std::string finishName){
             return;
         }
         toBeSolved.erase(toBeSolved.begin()+tempI);
-        //cout<<"test"<<endl;
         solved.push_back(temp);
+        //find closest neighbor
         for(int i=0;i<temp->adj.size();i++){
             adjVertex neighbor=temp->adj[i];
-            //cout<<"neighbor:"<<endl;
-            //cout<<neighbor.v->name<<endl;
             bool test=true;
+            //find if neighbor is solved
             for(int j=0;j<solved.size();j++){
                 if(neighbor.v->name==solved[j]->name){
-                    //cout<<"solved"<<endl;
                     test=false;
                 }
             }
             if(test){
+                //find closest neighbor
                 int tempDist=temp->distance+neighbor.weight;
                 for(int j=0;j<toBeSolved.size();j++){
                     if(neighbor.v->name==toBeSolved[j]->name){
@@ -512,6 +510,7 @@ void Graph::aStar(std::string startName,std::string finishName){
                         test=false;
                     }
                 }
+                //add neighbor toBeSolved and update neighbor info if necessary
                 if(test||tempDist<neighbor.v->distance){
                     //cout<<"stuff gotta change"<<endl;
                     neighbor.v->previous=temp;
@@ -620,6 +619,7 @@ void Graph::play(){
     }
     cout<<"Choose one:"<<endl;
     getline(cin,input);
+    //move player
     for(int i=0;i<you.currentLocation->adj.size();i++){
         if(you.currentLocation->adj[i].v->name==input){
             int weight=you.currentLocation->adj[i].weight;
