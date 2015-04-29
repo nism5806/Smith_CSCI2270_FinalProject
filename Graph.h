@@ -42,6 +42,7 @@ public:
     void Dijkstra(std::string start, std::string finish);
     void aStar(std::string start, std::string finish);
     void play();
+    void cheat(std::string answer);
     int pathLength(std::string start,std::string finish);
 private:
     std::vector<vertex> vertices;
