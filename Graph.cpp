@@ -617,6 +617,12 @@ void Graph::play(){
     for(int i=0;i<you.currentLocation->adj.size();i++){
         cout<<you.currentLocation->adj[i].v->name<<" - "<<you.currentLocation->adj[i].weight<<endl;
     }
+    if(vertices.size() < 17)
+    {
+    cout <<"Would you like to cheat?   1: Yes   2: No" << endl; /** added by dylanlcole **/
+    getline(cin,input);
+    }
+    cheat(input);
     cout<<"Choose one:"<<endl;
     getline(cin,input);
     //move player
@@ -645,4 +651,33 @@ void Graph::play(){
     }
 
 
+}
+
+/**
+Function prototype:
+    void Graph::cheat(string answer)
+
+Function description
+    This function allows the user to find the path if the game in below a certain difficulty
+
+Pre-conditions
+    vertices has been built and answer is a valid ascii string
+Post-conditions
+    prints out the shortest path from where the user currently is at
+
+**/
+void Graph::cheat(string answer)
+{
+    if(answer == "1")
+    {
+            findShortestPath(you.start->name, you.destination->name);
+    }
+    else if( answer == "2")
+    {
+        cout << "Good Luck" << endl;
+    }
+    else
+    {
+        cout << "Invalid Input" << endl;
+    }
 }
